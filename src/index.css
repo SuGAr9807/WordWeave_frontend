@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+body{
+  background: #fff;
+}
