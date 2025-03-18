@@ -108,7 +108,7 @@ const ArticleEditor = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white shadow-lg rounded-lg">
+    <div className="p-6 max-w-4xl mx-auto bg-white shadow-lg rounded-lg mt-5">
       <h2 className="text-2xl font-bold mb-6">Create New Blog Post</h2>
       {message.text && (
         <div className={`p-3 mb-4 rounded ${message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>

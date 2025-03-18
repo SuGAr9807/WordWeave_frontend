@@ -5,7 +5,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  profileImage?: string;
+  profile_picture?: string;
   username?: string; // Added username to match new form
 }
 
@@ -25,7 +25,6 @@ const AuthContext = React.createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const navigate = useNavigate();
   
   // Check if user is already logged in on component mount
   useEffect(() => {
@@ -78,12 +77,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const data = await response.json();
       
-      // Save token to localStorage
-      localStorage.setItem('authToken', data.access_token);
-      console.log(data.access_token);
       
-      // Set user data
-      setUser(data.user);
+      localStorage.setItem('authToken', data.access_token);
+      const res = await fetch('http://127.0.0.1:8000/me', {
+        headers: {
+          'Authorization': `Bearer ${data.access_token}`
+        }
+      });
+      
+      if (!res.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      
+      const userData = await res.json();
+      setUser(userData)
     } catch (error) {
       console.error('Login error:', error);
       throw error;

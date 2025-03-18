@@ -7,6 +7,7 @@ import MostViewedPage from '@/components/pages/MostViewedPage';
 import ProfilePage from '@/components/pages/ProfilePage';
 import { AuthProvider, ProtectedRoute } from './context/AuthContext';
 import Navbar from './components/common/Navbar';
+import BlogDetailPage from './components/pages/BlogDetailPage';
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/blog/:post_id" element={<BlogDetailPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/most-viewed" element={<MostViewedPage />} />
