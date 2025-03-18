@@ -38,7 +38,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Write", path: "/write", protected: true },
-    { name: "Most Viewed", path: "/most-viewed" },
+    { name: "Top Blogs", path: "/top-blogs" },
   ];
 
   return (

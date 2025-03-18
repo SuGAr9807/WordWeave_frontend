@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { LoginPage, SignupPage } from '@/components/pages/AuthPages';
 import HomePage from '@/components/pages/HomePage';
 import WritePage from '@/components/pages/WritePage';
-import MostViewedPage from '@/components/pages/MostViewedPage';
 import ProfilePage from '@/components/pages/ProfilePage';
 import { AuthProvider, ProtectedRoute } from './context/AuthContext';
 import Navbar from './components/common/Navbar';
 import BlogDetailPage from './components/pages/BlogDetailPage';
+import TopBlogsPage from './components/pages/TopBlogsPage';
 
 const App: React.FC = () => {
   return (
@@ -21,7 +21,7 @@ const App: React.FC = () => {
               <Route path="/blog/:post_id" element={<BlogDetailPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
-              <Route path="/most-viewed" element={<MostViewedPage />} />
+              <Route path="/top-blogs" element={<TopBlogsPage />} />
               <Route 
                 path="/write" 
                 element={
