@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 
 // Define the types for our data
@@ -40,6 +40,7 @@ interface User {
 }
 
 const BlogDetailPage: React.FC = () => {
+  const navigate= useNavigate();
   const [blog, setBlog] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +60,6 @@ const BlogDetailPage: React.FC = () => {
         const token = localStorage.getItem('authToken');
         
         if (!token) {
-          // User is not logged in
           return;
         }
         
@@ -70,14 +70,13 @@ const BlogDetailPage: React.FC = () => {
         });
         
         if (!response.ok) {
-          throw new Error('Failed to fetch user data');
+          throw new Error("Error on fecthing")
         }
         
         const userData = await response.json();
         setCurrentUser(userData);
       } catch (err) {
         console.error('Error fetching current user:', err);
-        // Don't set error state here to avoid breaking the blog display
       }
     };
     
@@ -121,12 +120,12 @@ const BlogDetailPage: React.FC = () => {
       const token = localStorage.getItem('authToken');
       
       if (!token) {
-        setError('You must be logged in to like posts');
         setLikeInProgress(false);
+        navigate('/login')
         return;
       }
       
-      const response = await fetch(`http://127.0.0.1:8000/like-post/${blog.post_id}`, {
+      const response = await fetch(`http://127.0.0.1:8000/blogs/${blog.post_id}/like/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -167,7 +166,7 @@ const BlogDetailPage: React.FC = () => {
       const token = localStorage.getItem('authToken');
       
       if (!token) {
-        setCommentError('You must be logged in to comment');
+        navigate('/login')
         return;
       }
       
@@ -220,7 +219,7 @@ const BlogDetailPage: React.FC = () => {
       const token = localStorage.getItem('authToken');
       
       if (!token) {
-        setCommentError('You must be logged in to edit comments');
+        navigate('/login')
         return;
       }
       
@@ -264,7 +263,7 @@ const BlogDetailPage: React.FC = () => {
       const token = localStorage.getItem('authToken');
       
       if (!token) {
-        setCommentError('You must be logged in to delete comments');
+        navigate('/login')
         return;
       }
       
@@ -431,7 +430,7 @@ const BlogDetailPage: React.FC = () => {
             ) : (
               <div className="bg-gray-50 p-4 rounded-lg mb-6">
                 <p className="text-gray-700">
-                  Please <span className="text-blue-600 font-medium">log in</span> to leave a comment.
+                  Please <span className="text-blue-600 font-medium cursor-pointer" onClick={()=>{navigate('/login')}}>log in</span> to leave a comment.
                 </p>
               </div>
             )}
