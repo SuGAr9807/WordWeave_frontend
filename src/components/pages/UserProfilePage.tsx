@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 // Define the user data type based on your API response
 interface UserData {
@@ -25,29 +25,25 @@ interface BlogPost {
   comments: number;
 }
 
-const ProfilePage: React.FC = () => {
+const UserProfilePage: React.FC = () => {
+  const { user_id } = useParams<{ user_id: string }>();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [userBlogs, setUserBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [blogsLoading, setBlogsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [blogsError, setBlogsError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Make sure the auth token is included in the request headers
-        const response = await axios.get('http://127.0.0.1:8000/me', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}` // Assuming you store your token in localStorage
-          }
-        });
+        // Fetch user data by user_id from params
+        const response = await axios.get(`http://127.0.0.1:8000/blogs-list/users/${user_id}/`);
         setUserData(response.data);
         setLoading(false);
         
         // Once we have the user data, fetch their blogs
-        fetchUserBlogs(response.data.id);
+        fetchUserBlogs(user_id);
       } catch (err) {
         setError('Failed to load profile data. Please try again later.');
         setLoading(false);
@@ -55,14 +51,10 @@ const ProfilePage: React.FC = () => {
       }
     };
 
-    const fetchUserBlogs = async (userId: string) => {
+    const fetchUserBlogs = async (uid: string) => {
       setBlogsLoading(true);
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/blogs-list/${userId}/user-posts/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`
-          }
-        });
+        const response = await axios.get(`http://127.0.0.1:8000/blogs-list/${uid}/user-posts/`);
         setUserBlogs(response.data);
         setBlogsLoading(false);
       } catch (err) {
@@ -72,16 +64,13 @@ const ProfilePage: React.FC = () => {
       }
     };
 
-    fetchUserData();
-  }, []);
-
-  const handleEditBlog = (blogId: string) => {
-    navigate(`/edit/${blogId}`);
-  };
-
-  const handleCreateBlog = () => {
-    navigate('/write');
-  };
+    if (user_id) {
+      fetchUserData();
+    } else {
+      setError('User ID not found in URL.');
+      setLoading(false);
+    }
+  }, [user_id]);
 
   if (loading) {
     return (
@@ -128,7 +117,7 @@ const ProfilePage: React.FC = () => {
       {/* User Profile Section */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden mb-8">
         <div className="bg-blue-600 p-6 text-white">
-          <h1 className="text-2xl font-bold">User Profile</h1>
+          <h1 className="text-2xl font-bold">{userData.name}'s Profile</h1>
         </div>
         
         <div className="flex flex-col md:flex-row p-6">
@@ -153,61 +142,35 @@ const ProfilePage: React.FC = () => {
             </div>
             
             <div className="space-y-4">
-              {/* Email on one line */}
+              {/* Email (only visible if appropriate for public view) */}
               <div className="border-b pb-3">
                 <p className="text-gray-500 text-sm">Email</p>
                 <p>{userData.email}</p>
               </div>
               
-              {/* Other three data points on one line */}
+              {/* Other data points on one line */}
               <div className="flex flex-wrap">
                 <div className="mr-6">
                   <p className="text-gray-500 text-sm">Member Since</p>
                   <p>{formattedDate}</p>
                 </div>
                 
-                <div className="mr-6">
+                <div>
                   <p className="text-gray-500 text-sm">Status</p>
                   <p className={userData.is_active ? "text-green-600" : "text-red-600"}>
                     {userData.is_active ? "Active" : "Inactive"}
                   </p>
                 </div>
-                
-                <div>
-                  <p className="text-gray-500 text-sm">User ID</p>
-                  <p className="text-gray-600 text-sm">{userData.id}</p>
-                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div className="border-t p-6">
-          <button 
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md mr-3"
-            onClick={() => console.log('Edit profile clicked')}
-          >
-            Edit Profile
-          </button>
-          <button 
-            className="border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-100"
-            onClick={() => console.log('Change password clicked')}
-          >
-            Change Password
-          </button>
         </div>
       </div>
 
       {/* User Blogs Section */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="bg-blue-600 p-6 text-white flex justify-between items-center">
-          <h2 className="text-2xl font-bold">My Blog Posts</h2>
-          <button 
-            onClick={handleCreateBlog}
-            className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-2 px-4 rounded-md"
-          >
-            Write New Blog
-          </button>
+        <div className="bg-blue-600 p-6 text-white">
+          <h2 className="text-2xl font-bold">{userData.name}'s Blog Posts</h2>
         </div>
         
         <div className="p-6">
@@ -219,13 +182,7 @@ const ProfilePage: React.FC = () => {
             <div className="text-red-500 py-4">{blogsError}</div>
           ) : userBlogs.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">You haven't written any blog posts yet.</p>
-              <button 
-                onClick={handleCreateBlog}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md"
-              >
-                Create Your First Blog
-              </button>
+              <p className="text-gray-500 mb-4">This user hasn't written any blog posts yet.</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -244,32 +201,26 @@ const ProfilePage: React.FC = () => {
                     <div className={`p-4 ${blog.image_url ? 'md:w-3/4' : 'w-full'}`}>
                       <h3 className="text-xl font-bold mb-2">{blog.title}</h3>
                       <div 
-                            className="text-gray-600 mb-3 line-clamp-2"
-                            dangerouslySetInnerHTML={{ 
-                              __html: blog.content.length > 150 
-                                ? blog.content.substring(0, 150) + '...' 
-                                : blog.content 
-                            }} 
-                          />
+                        className="text-gray-600 mb-3 line-clamp-2"
+                        dangerouslySetInnerHTML={{ 
+                          __html: blog.content.length > 150 
+                            ? blog.content.substring(0, 150) + '...' 
+                            : blog.content 
+                        }} 
+                      />
                       <div className="flex justify-between items-center text-sm">
                         <div className="flex space-x-4">
                           <span>👍 {blog.likes} Likes</span>
                           <span>💬 {blog.comments} Comments</span>
                           <span>📅 {formatBlogDate(blog.created_at)}</span>
                         </div>
-                        <div className="flex space-x-2">
-                          <button 
-                            onClick={() => handleEditBlog(blog.post_id)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-md text-sm"
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            onClick={() => navigate(`/blog/${blog.post_id}`)}
+                        <div>
+                          <a 
+                            href={`/blog/${blog.post_id}`}
                             className="bg-gray-600 hover:bg-gray-700 text-white py-1 px-3 rounded-md text-sm"
                           >
                             View
-                          </button>
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -284,4 +235,4 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage;
+export default UserProfilePage;

@@ -8,6 +8,8 @@ import { AuthProvider, ProtectedRoute } from './context/AuthContext';
 import Navbar from './components/common/Navbar';
 import BlogDetailPage from './components/pages/BlogDetailPage';
 import TopBlogsPage from './components/pages/TopBlogsPage';
+import UserProfilePage from './components/pages/userProfilePage';
+import EditPage from './components/pages/EditPage';
 
 const App: React.FC = () => {
   return (
@@ -19,6 +21,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/blog/:post_id" element={<BlogDetailPage />} />
+              <Route path="/user/:user_id" element={<UserProfilePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/top-blogs" element={<TopBlogsPage />} />
@@ -27,6 +30,14 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <WritePage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/edit/:blog_id" 
+                element={
+                  <ProtectedRoute>
+                    <EditPage />
                   </ProtectedRoute>
                 } 
               />
