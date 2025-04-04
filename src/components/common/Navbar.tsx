@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
           {/* Left - Logo & Navigation */}
           <div className="flex items-center">
             {/* Logo */}
-            <span className="text-xl font-bold text-indigo-600">Logo</span>
+            <span className="text-xl font-bold text-indigo-600">WordWeave</span>
 
             {/* Desktop Navigation */}
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
