@@ -51,7 +51,7 @@ const BlogList = () => {
   return (
     <div className="container mx-auto p-4">
       {/* Tags Filter */}
-      <div className="sticky top-0 z-10 flex overflow-x-auto bg-white p-2 shadow-sm">
+      <div className="sticky top-0 z-10 flex overflow-x-auto p-2">
         {tags.map((tag) => (
           <button
             key={tag.tag_id}
